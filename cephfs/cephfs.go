@@ -32,6 +32,17 @@ func CreateMount() (*MountInfo, error) {
 	}
 }
 
+func (mount *MountInfo) ReadConfigFile(path string) error {
+	c_path := C.CString(path)
+	defer C.free(unsafe.Pointer(c_path))
+	ret := C.ceph_conf_read_file(mount.mount, c_path)
+	if ret == 0 {
+		return nil
+	} else {
+		return CephError(ret)
+	}
+}
+
 func (mount *MountInfo) ReadDefaultConfigFile() error {
 	ret := C.ceph_conf_read_file(mount.mount, nil)
 	if ret == 0 {
